@@ -1,0 +1,48 @@
+namespace: snake-game
+snake-game:
+  defines: runnable
+  metadata:
+    name: snake-game
+    description: An online snake game with high score functionality
+    icon: https://emojiapi.dev/api/v1/snake.svg
+  containers:
+    snake-game:
+      build: .
+  services:
+    fastify-server-port:
+      container: snake-game
+      port: 3001
+      host-port: 3001
+      publish: false
+      protocol: TCP
+      description: This port is used for fastify server to listen incoming HTTP request
+  connections:
+    mongodb:
+      target: jenkins/server
+      service: http
+  variables:
+    db-host:
+      env: DB_HOST
+      type: string
+      description: The host address of MongoDB
+      value: <- connection-hostname("mongodb")
+    db-port:
+      env: DB_PORT
+      type: string
+      description: The port of MongoDB
+      value: <- connection-port("mongodb")
+    db-name:
+      env: DB_NAME
+      type: string
+      description: The name of MongoDB database
+      value: '!!!SETME!!!'
+    db-user:
+      env: DB_USER
+      type: string
+      description: The username for MongoDB
+      value: '!!!SETME!!!'
+    db-pass:
+      env: DB_PASS
+      type: string
+      description: The password for MongoDB
+      value: '!!!SETME!!!'
