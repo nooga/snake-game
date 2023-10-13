@@ -1,0 +1,56 @@
+namespace: snake-game
+snake-game:
+  defines: runnable
+  metadata:
+    name: snake-game
+    description: A classic snake game that saves highscores in a MongoDB.
+    icon: https://emojiapi.dev/api/v1/snake.svg
+  containers:
+    snake-game:
+      build: .
+  services:
+    app-port:
+      container: snake-game
+      port: 3001
+      host-port: 3001
+      publish: false
+      protocol: TCP
+      description: Port on which the snake-game application is exposed.
+  connections:
+    mongodb:
+      target: snake-game/mongodb
+      service: mongodb
+  variables:
+    db-host:
+      env: DB_HOST
+      type: string
+      description: MongoDB host
+      value: <- connection-hostname("mongodb")
+    db-port:
+      env: DB_PORT
+      type: int
+      description: MongoDB port
+      value: <- connection-port("mongodb")
+    db-name:
+      env: DB_NAME
+      type: string
+      description: MongoDB's database name to connect
+      value: snakegame
+    db-user:
+      env: DB_USER
+      type: string
+      description: MongoDB username
+      value: '!!!SETME-USE-SECRETS!!!'
+    db-pass:
+      env: DB_PASS
+      type: string
+      description: MongoDB user password
+      value: '!!!SETME-USE-SECRETS!!!'
+mongodb:
+  defines: runnable
+  inherits: mongodb/mongodb
+stack:
+  defines: group
+  members:
+    - snake-game/snake-game
+    - snake-game/mongodb
