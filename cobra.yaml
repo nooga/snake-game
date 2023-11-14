@@ -1,0 +1,59 @@
+namespace: cobra
+cobra:
+  defines: runnable
+  metadata:
+    name: cobra
+    description: >-
+      A snake game, move the snake with either arrow keys or touch controls,
+      gulp food and avoid collision with wall, save highscores.
+    icon: https://emojiapi.dev/api/v1/snake.svg
+  containers:
+    cobra:
+      build: .
+      image: env-1883.registry.local/cobra:main-de90c06
+  services:
+    server-port:
+      container: cobra
+      port: 3001
+      host-port: 3001
+      publish: false
+      protocol: TCP
+      description: Port at which the main server listens.
+  connections:
+    database-connection:
+      target: cobra/mongodb
+      service: mongodb
+  variables:
+    db-host:
+      env: DB_HOST
+      type: string
+      description: MongoDB host
+      value: <- connection-hostname("database-connection")
+    db-port:
+      env: DB_PORT
+      type: string
+      description: MongoDB port
+      value: <- connection-port("database-connection")
+    db-name:
+      env: DB_NAME
+      type: string
+      description: Database name
+      value: snakegame
+    db-user:
+      env: DB_USER
+      type: string
+      description: Database username
+      value: root
+    db-pass:
+      env: DB_PASS
+      type: string
+      description: Database password
+      value: '!!!SETME-USE-SECRETS!!!'
+mongodb:
+  defines: runnable
+  inherits: mongodb/mongodb
+stack:
+  defines: group
+  members:
+    - cobra/cobra
+    - cobra/mongodb
