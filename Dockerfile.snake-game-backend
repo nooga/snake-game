@@ -1,0 +1,13 @@
+FROM node:16
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm install
+COPY . .
+ENV DB_HOST=mongo
+ENV DB_PORT=27017
+ENV DB_NAME=snake-game
+# Optionally include these if needed
+# ENV DB_USER=yourusername
+# ENV DB_PASS=yourpassword
+EXPOSE 3001
+CMD ["node", "index.js"]
