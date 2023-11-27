@@ -1,0 +1,23 @@
+FROM node:14
+
+# Create app directory
+WORKDIR /usr/src/app
+
+# Install app dependencies
+COPY package*.json ./
+
+RUN npm install
+
+# Bundle app source
+COPY . .
+
+# Environment variables for MongoDB connection
+# These should be overridden with real values when running the container
+ENV DB_HOST=mongodb_host
+ENV DB_PORT=27017
+ENV DB_NAME=snake_game_db
+ENV DB_USER=username
+ENV DB_PASS=password
+
+EXPOSE 3001
+CMD [ "node", "index.js" ]
