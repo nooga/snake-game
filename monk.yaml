@@ -1,0 +1,91 @@
+namespace: snake-game
+
+mongodb:
+  defines: runnable
+  inherits: mongodb/mongodb
+  metadata:
+    name: mongodb
+    description: MongoDB database service required for the game's high-score functionality
+    icon: >-
+      https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA8VbFgxH-i78AZmNqD93mVRkTRd30POqLeCmg9T05ug&s
+  variables:
+    mongo-image:
+      type: string
+      value: latest
+      description: ''
+    mongo-init-database:
+      type: string
+      value: mongo
+      description: ''
+    mongo-init-password:
+      type: string
+      value: password
+      description: ''
+    mongo-init-username:
+      type: string
+      value: mongo
+      description: ''
+    mongodb-image:
+      type: string
+      value: latest
+      description: ''
+
+cobra-game:
+  defines: runnable
+  metadata:
+    name: cobra-game
+    description: >-
+      Node.js application serving a simple snake game with a persistent
+      high-score chart
+    icon: https://emojiapi.dev/api/v1/robot.svg
+  containers:
+    cobra-game:
+      image: env-2089.registry.local/cobra-game:demo-de90c06
+      build: .
+      dockerfile: Dockerfile.cobra-game
+  services:
+    http-server-port:
+      description: HTTP server listening port
+      container: cobra-game
+      port: 3000
+      host-port: 3000
+      publish: true
+      protocol: tcp
+  connections:
+    mongodb-connection:
+      target: snake-game/mongodb
+      service: mongodb
+      optional: true
+      description: Connection to the MongoDB service for high-score functionality
+  variables:
+    db-host:
+      env: DB_HOST
+      type: string
+      value: <- connection-hostname("mongodb-connection")
+      description: Database host for the MongoDB connection
+    db-port:
+      env: DB_PORT
+      type: int
+      value: <- connection-port("mongodb-connection")
+      description: Database port for the MongoDB connection
+    db-name:
+      env: DB_NAME
+      type: string
+      value: mongo
+      description: Database name for the MongoDB connection
+    db-user:
+      env: DB_USER
+      type: string
+      value: mongo
+      description: Database user for the MongoDB connection
+    db-pass:
+      env: DB_PASS
+      type: string
+      value: password
+      description: Database password for the MongoDB connection
+
+stack:
+  defines: group
+  members:
+    - snake-game/mongodb
+    - snake-game/cobra-game
