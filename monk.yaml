@@ -38,12 +38,12 @@ snake-game-backend:
     icon: https://emojiapi.dev/api/v1/robot.svg
   containers:
     snake-game-backend:
-      image: env-4469.registry.local/snake-game-backend:main-de90c06
+      image: env-4471.registry.local/snake-game-backend:monk-main-2401071518-2fa9fb2
       build: .
       dockerfile: Dockerfile.snake-game-backend
   services:
-    http-server-port:
-      description: Port for HTTP server to serve the game and API
+    http-server:
+      description: HTTP server listening on port 3001
       container: snake-game-backend
       port: 3001
       host-port: 3001
@@ -54,33 +54,33 @@ snake-game-backend:
       target: snake-game/mongodb
       service: mongodb
       optional: true
-      description: Connection to the MongoDB database
+      description: Connection to MongoDB for high scores storage
   variables:
     db-host:
       env: DB_HOST
       type: string
       value: <- connection-hostname("mongodb-connection")
-      description: Hostname for the MongoDB database
+      description: Database host for MongoDB connection
     db-port:
       env: DB_PORT
       type: int
       value: <- connection-port("mongodb-connection")
-      description: Port for the MongoDB database
+      description: Database port for MongoDB connection
     db-name:
       env: DB_NAME
       type: string
       value: mongo
-      description: Database name for the MongoDB connection
+      description: Database name for MongoDB connection
     db-user:
       env: DB_USER
       type: string
       value: mongo
-      description: Username for the MongoDB database
+      description: Database user for MongoDB connection
     db-pass:
       env: DB_PASS
       type: string
       value: password
-      description: Password for the MongoDB database
+      description: Database password for MongoDB connection
 
 stack:
   defines: group
