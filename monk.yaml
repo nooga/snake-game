@@ -1,0 +1,95 @@
+namespace: snake-game
+
+snake-game-backend:
+  defines: runnable
+  metadata:
+    name: snake-game-backend
+    description: >-
+      Node.js backend service for the snake game, serving static files and
+      handling high scores.
+    icon: https://emojiapi.dev/api/v1/robot.svg
+  containers:
+    snake-game-backend:
+      image: env-4665.registry.local/snake-game-backend:main-l7d40o
+      build: .
+      dockerfile: Dockerfile.snake-game-backend
+  services:
+    http-server-port:
+      description: HTTP server listening port
+      container: snake-game-backend
+      port: 3001
+      host-port: 3001
+      publish: true
+      protocol: tcp
+  connections:
+    database-connection:
+      target: snake-game/snake-game-database
+      service: mongodb-default-port
+      optional: true
+      description: Connection from snake-game-backend to snake-game-database
+  variables:
+    db-host:
+      env: DB_HOST
+      type: string
+      value: <- connection-hostname("database-connection")
+      description: Database host for the snake game backend
+    db-port:
+      env: DB_PORT
+      type: int
+      value: <- connection-port("database-connection")
+      description: Database port for the snake game backend
+    db-name:
+      env: DB_NAME
+      type: string
+      value: snakeGameDB
+      description: Database name for the snake game backend
+    db-user:
+      env: DB_USER
+      type: string
+      value: snakeUser
+      description: Database user for the snake game backend
+    db-pass:
+      env: DB_PASS
+      type: string
+      value: s3cur3P@ssw0rd
+      description: Database password for the snake game backend
+
+snake-game-database:
+  defines: runnable
+  metadata:
+    name: snake-game-database
+    description: MongoDB database for storing high scores of the snake game.
+    icon: https://emojiapi.dev/api/v1/file_cabinet.svg
+  containers:
+    snake-game-database:
+      image: mongo
+      build: .
+  services:
+    mongodb-default-port:
+      description: Default MongoDB port for database connections
+      container: snake-game-database
+      port: 27017
+      host-port: 27017
+      publish: true
+      protocol: tcp
+  connections:
+    database-connection:
+      target: snake-game/snake-game-backend
+      service: '!!!SETME!!!'
+      optional: true
+      description: >-
+        MongoDB database connection from snake-game-backend to
+        snake-game-database
+  variables: {}
+
+stack:
+  defines: group
+  members:
+    - snake-game/snake-game-backend
+    - snake-game/snake-game-database
+  metadata:
+    name: snake-game
+    description: >-
+      A simple snake game with a persistent high-score chart, built with Node.js
+      and MongoDB.
+    icon: https://emojiapi.dev/api/v1/snake.svg
