@@ -1,0 +1,28 @@
+# Use the official Node.js image as the base image
+FROM node:14
+
+# Set the working directory
+WORKDIR /usr/src/app
+
+# Copy package.json and package-lock.json to the working directory
+COPY package.json package-lock.json ./
+
+# Install the application dependencies
+RUN npm install
+
+# Copy the rest of the application code to the working directory
+COPY . .
+
+# Set environment variables for MongoDB connection
+# These should be provided at runtime
+ENV DB_HOST=localhost \
+    DB_PORT=27017 \
+    DB_NAME=snake_game \
+    DB_USER=user \
+    DB_PASS=pass
+
+# Expose the port the app runs on
+EXPOSE 3001
+
+# Command to run the application
+CMD ["node", "index.js"]
