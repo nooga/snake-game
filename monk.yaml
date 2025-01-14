@@ -1,0 +1,102 @@
+namespace: snake-game
+
+mongodb:
+  defines: runnable
+  inherits: mongodb/mongodb
+  metadata:
+    name: mongodb
+    description: MongoDB database for storing high scores.
+    icon: >-
+      https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA8VbFgxH-i78AZmNqD93mVRkTRd30POqLeCmg9T05ug&s
+  variables:
+    mongo-image:
+      type: string
+      value: latest
+      description: ''
+    mongo-init-database:
+      type: string
+      value: mongo
+      description: ''
+    mongo-init-password:
+      type: string
+      value: password
+      description: ''
+    mongo-init-username:
+      type: string
+      value: mongo
+      description: ''
+    mongodb-image:
+      type: string
+      value: latest
+      description: ''
+
+fastify-server:
+  defines: runnable
+  metadata:
+    name: fastify-server
+    description: Fastify server that serves the snake game and handles high score data.
+    icon: https://emojiapi.dev/api/v1/rocket.svg
+  containers:
+    fastify-server:
+      image: env-4960.registry.local/fastify-server:main-hzqgnm8
+      build: .
+      dockerfile: Dockerfile.fastify-server
+  services:
+    fastify-server-port:
+      description: Port on which the Fastify server runs and serves the snake game.
+      container: fastify-server
+      port: 3001
+      host-port: 3001
+      publish: true
+      protocol: tcp
+  connections:
+    mongodb-connection:
+      target: snake-game/mongodb
+      service: mongodb
+      optional: true
+      description: >-
+        Connection to the MongoDB database for storing and retrieving high
+        scores.
+  variables:
+    db-host:
+      env: DB_HOST
+      type: string
+      value: <- connection-hostname("mongodb-connection")
+      description: Host address for the MongoDB database.
+    db-port:
+      env: DB_PORT
+      type: int
+      value: <- connection-port("mongodb-connection")
+      description: Port number for the MongoDB database.
+    db-name:
+      env: DB_NAME
+      type: string
+      value: snakegame
+      description: Name of the MongoDB database.
+    db-user:
+      env: DB_USER
+      type: string
+      value: mongo
+      description: Username for accessing the MongoDB database.
+    db-pass:
+      env: DB_PASS
+      type: string
+      value: password
+      description: Password for accessing the MongoDB database.
+    mongodb-uri:
+      env: MONGODB_URI
+      type: string
+      value: mongodb://localhost:27017/snakegame
+      description: URI for connecting to the MongoDB database.
+
+stack:
+  defines: group
+  members:
+    - snake-game/mongodb
+    - snake-game/fastify-server
+  metadata:
+    name: snake-game
+    description: >-
+      A simple snake game with a persistent high-score chart, implemented using
+      Node.js and Fastify, with a MongoDB backend for storing high scores.
+    icon: https://emojiapi.dev/api/v1/snake.svg
